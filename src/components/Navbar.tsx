@@ -9,7 +9,8 @@ import {
   MessageCircle,
   Menu,
   X,
-  Search
+  Search,
+  Sparkles
 } from "lucide-react";
 
 interface NavbarProps {
@@ -57,9 +58,16 @@ const Navbar = ({ onAuthClick, onWalletClick }: NavbarProps) => {
 
           {/* Actions */}
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="neon" size="sm" onClick={onWalletClick}>
+            <Button 
+              variant="neon" 
+              size="sm" 
+              onClick={onWalletClick}
+              className="relative overflow-hidden group/wallet animate-pulse hover:animate-none"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-neon-green/20 to-neon-cyan/20 group-hover/wallet:opacity-100 opacity-0 transition-opacity" />
               <Wallet className="w-4 h-4" />
-              <span>Nạp tiền</span>
+              <span className="font-bold">Nạp tiền</span>
+              <Sparkles className="w-3 h-3 text-neon-orange ml-1" />
             </Button>
             <Button variant="gaming" size="sm" onClick={onAuthClick}>
               <User className="w-4 h-4" />
