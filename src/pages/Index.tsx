@@ -3,7 +3,6 @@ import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import ProminentSearchBar from "@/components/ProminentSearchBar";
 import GameGrid from "@/components/GameGrid";
-import Leaderboard from "@/components/Leaderboard";
 import FloatingChatWidget from "@/components/FloatingChatWidget";
 import AuthModal from "@/components/AuthModal";
 import WalletModal from "@/components/WalletModal";
@@ -32,7 +31,6 @@ const Index = () => {
         <HeroSection />
         <ProminentSearchBar onSearch={handleSearch} />
         <GameGrid />
-        <Leaderboard />
       </main>
 
       {/* Footer */}
