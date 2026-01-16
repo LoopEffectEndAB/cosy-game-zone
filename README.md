@@ -36,6 +36,57 @@ npm i
 npm run dev
 ```
 
+## Running the full app (frontend + backend)
+
+This project includes a small Express + Socket.IO backend under `server/` and a Vite React frontend at the repo root.
+
+1. Install dependencies for both projects:
+
+```powershell
+# from repo root
+npm install
+cd server
+npm install
+cd ..
+```
+
+2. Configure environment variables:
+
+- Copy `server/.env.example` → `server/.env` and set `JWT_SECRET` (don't use default in production).
+- Copy `.env.local.example` → `.env.local` at repo root to set `VITE_API_BASE` (default: `http://localhost:4000`).
+
+3. Run dev servers (two terminals):
+
+```powershell
+# terminal 1 - backend
+cd server
+npm run dev
+
+# terminal 2 - frontend
+cd ..
+npm run dev
+```
+
+Or on Windows you can run the helper script:
+
+```powershell
+.\run-dev.ps1
+```
+
+4. Open the frontend in your browser (Vite will show the URL, usually `http://localhost:5173`).
+
+Notes and recommendations
+- Set `JWT_SECRET` in `server/.env` before creating real users.
+- The server uses `server/data/db.json` (lowdb) for simple persistence — this is for development only.
+
+Recommended VS Code extensions
+- ESLint (`dbaeumer.vscode-eslint`)
+- Prettier (`esbenp.prettier-vscode`)
+- Tailwind CSS IntelliSense (`bradlc.vscode-tailwindcss`)
+- Volar (`johnsoncodehk.volar`) — helpful for TypeScript in Vue; optional for other stacks
+- GitLens (`eamodio.gitlens`)
+
+
 **Edit a file directly in GitHub**
 
 - Navigate to the desired file(s).

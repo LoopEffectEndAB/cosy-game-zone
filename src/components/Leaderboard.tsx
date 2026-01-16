@@ -1,17 +1,49 @@
 import { Trophy, Medal, Crown, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { useEffect, useState } from "react";
+import api from "@/lib/api";
+import { toast } from "@/components/ui/use-toast";
+import auth from "@/lib/auth";
 
-const leaderboardData = [
-  { rank: 1, name: "ProGamer_VN", avatar: "https://i.pravatar.cc/100?img=1", score: 125800, change: "up" },
-  { rank: 2, name: "NightWolf99", avatar: "https://i.pravatar.cc/100?img=2", score: 118500, change: "up" },
-  { rank: 3, name: "DragonSlayer", avatar: "https://i.pravatar.cc/100?img=3", score: 112300, change: "down" },
-  { rank: 4, name: "CyberNinja", avatar: "https://i.pravatar.cc/100?img=4", score: 98700, change: "same" },
-  { rank: 5, name: "PixelMaster", avatar: "https://i.pravatar.cc/100?img=5", score: 95200, change: "up" },
-  { rank: 6, name: "StormRider", avatar: "https://i.pravatar.cc/100?img=6", score: 89400, change: "down" },
-  { rank: 7, name: "GhostPlayer", avatar: "https://i.pravatar.cc/100?img=7", score: 85100, change: "same" },
-  { rank: 8, name: "LegendKing", avatar: "https://i.pravatar.cc/100?img=8", score: 82800, change: "up" },
-];
+import { useEffect, useState } from "react";
+import api from "@/lib/api";
 
 const Leaderboard = () => {
+  const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
+  const [submitName, setSubmitName] = useState(auth.getUser()?.username || "");
+  const [submitScore, setSubmitScore] = useState(0);
+
+  const load = async () => {
+    try {
+      const res = await api.getLeaderboard();
+      if (res?.ok) setLeaderboardData(res.leaderboard || []);
+    } catch (e) {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const handleSubmitScore = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!submitName || !submitScore) {
+      toast({ title: "Lỗi", description: "Vui lòng nhập tên và số điểm" });
+      return;
+    }
+    try {
+      const res = await api.submitScore({ name: submitName, score: Number(submitScore) });
+      if (res?.ok) {
+        setLeaderboardData(res.leaderboard || []);
+        toast({ title: "Gửi điểm thành công" });
+      } else {
+        toast({ title: "Lỗi", description: res?.error || "Không thể gửi điểm" });
+      }
+    } catch (e) {
+      toast({ title: "Lỗi", description: "Lỗi kết nối tới server" });
+    }
+  };
+
   return (
     <section className="py-20 relative overflow-hidden">
       {/* Background */}
@@ -29,6 +61,14 @@ const Leaderboard = () => {
             </h2>
           </div>
           <p className="text-muted-foreground">Top game thủ xuất sắc nhất tuần</p>
+        </div>
+        {/* Submit Score */}
+        <div className="max-w-md mx-auto mb-6">
+          <form onSubmit={handleSubmitScore} className="flex gap-2">
+            <input value={submitName} onChange={(e) => setSubmitName(e.target.value)} placeholder="Tên" className="flex-1 h-10 px-3 rounded-lg bg-muted/50 border border-border/50" />
+            <input value={submitScore} onChange={(e) => setSubmitScore(Number(e.target.value))} type="number" placeholder="Điểm" className="w-28 h-10 px-3 rounded-lg bg-muted/50 border border-border/50" />
+            <button className="px-4 py-2 rounded-lg bg-primary text-primary-foreground" type="submit">Gửi</button>
+          </form>
         </div>
 
         {/* Top 3 Podium */}

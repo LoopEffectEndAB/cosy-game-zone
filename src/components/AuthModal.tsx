@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { X, Mail, Lock, User, Eye, EyeOff, Gamepad2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import api from "@/lib/api";
+import { toast } from "@/components/ui/use-toast";
+import auth from "@/lib/auth";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -21,8 +24,33 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement auth logic with Lovable Cloud
-    console.log("Auth submit:", mode, formData);
+    (async () => {
+      try {
+        if (mode === "register") {
+          const res = await api.register({ username: formData.username, email: formData.email, password: formData.password });
+          if (res?.ok) {
+            auth.setToken(res.token);
+            auth.setUser(res.user);
+            toast({ title: "Đăng ký thành công", description: `Xin chào ${res.user.username}` });
+            onClose();
+          } else {
+            toast({ title: "Lỗi", description: res?.error || "Không thể đăng ký" });
+          }
+        } else {
+          const res = await api.login({ email: formData.email, password: formData.password });
+          if (res?.ok) {
+            auth.setToken(res.token);
+            auth.setUser(res.user);
+            toast({ title: "Đăng nhập thành công", description: `Xin chào ${res.user.username}` });
+            onClose();
+          } else {
+            toast({ title: "Lỗi", description: res?.error || "Đăng nhập thất bại" });
+          }
+        }
+      } catch (err) {
+        toast({ title: "Lỗi", description: "Lỗi kết nối tới server" });
+      }
+    })();
   };
 
   return (

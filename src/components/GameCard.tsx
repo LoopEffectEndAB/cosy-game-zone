@@ -1,5 +1,8 @@
 import { Lock, Star, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import SubmitScoreModal from "./SubmitScoreModal";
+import auth from "@/lib/auth";
 
 interface GameCardProps {
   title: string;
@@ -24,6 +27,7 @@ const GameCard = ({
   isFeatured = false,
   isCompact = false
 }: GameCardProps) => {
+  const [showSubmit, setShowSubmit] = useState(false);
   return (
     <div className={`game-card group cursor-pointer ${isFeatured && !isCompact ? 'col-span-2 row-span-2' : ''}`}>
       {/* Image */}
@@ -92,9 +96,15 @@ const GameCard = ({
                 Mở khóa
               </Button>
             ) : (
-              <Button variant="gaming" size="sm">
-                Chơi
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button variant="gaming" size="sm">
+                  Chơi
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => setShowSubmit(true)}>
+                  Gửi điểm
+                </Button>
+                <SubmitScoreModal isOpen={showSubmit} onClose={() => setShowSubmit(false)} defaultName={auth.getUser()?.username || ''} onSubmitted={() => {}} />
+              </div>
             )
           )}
         </div>

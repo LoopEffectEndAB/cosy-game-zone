@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Users, MessageCircle, UserPlus, Search, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -10,14 +10,12 @@ interface Friend {
   game?: string;
 }
 
-const friends: Friend[] = [
-  { id: 1, name: "ProGamer_VN", avatar: "https://i.pravatar.cc/100?img=11", status: "playing", game: "Cyber Racers" },
-  { id: 2, name: "NightWolf99", avatar: "https://i.pravatar.cc/100?img=12", status: "online" },
-  { id: 3, name: "DragonSlayer", avatar: "https://i.pravatar.cc/100?img=13", status: "online" },
-  { id: 4, name: "CyberNinja", avatar: "https://i.pravatar.cc/100?img=14", status: "offline" },
-  { id: 5, name: "PixelMaster", avatar: "https://i.pravatar.cc/100?img=15", status: "playing", game: "Space Warriors" },
-  { id: 6, name: "StormRider", avatar: "https://i.pravatar.cc/100?img=16", status: "offline" },
-];
+import api from "@/lib/api";
+import auth from "@/lib/auth";
+import { toast } from "@/components/ui/use-toast";
+import AddFriendModal from "./AddFriendModal";
+
+const initialFriends: Friend[] = [];
 
 interface FriendsSidebarProps {
   isOpen: boolean;
@@ -27,10 +25,23 @@ interface FriendsSidebarProps {
 
 const FriendsSidebar = ({ isOpen, onClose, onOpenChat }: FriendsSidebarProps) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [friends, setFriends] = useState<Friend[]>(initialFriends);
+  const [showAdd, setShowAdd] = useState(false);
 
-  const filteredFriends = friends.filter(friend => 
-    friend.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await api.getFriends();
+        if (mounted && res?.ok) setFriends(res.friends || []);
+      } catch (e) {
+        // ignore
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  const filteredFriends = friends.filter(friend => friend.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   const onlineFriends = filteredFriends.filter(f => f.status !== "offline");
   const offlineFriends = filteredFriends.filter(f => f.status === "offline");
@@ -115,11 +126,16 @@ const FriendsSidebar = ({ isOpen, onClose, onOpenChat }: FriendsSidebarProps) =>
 
         {/* Add Friend Button */}
         <div className="p-4 border-t border-border/50">
-          <Button variant="neon" className="w-full">
+          <Button
+            variant="neon"
+            className="w-full"
+            onClick={() => setShowAdd(true)}
+          >
             <UserPlus className="w-4 h-4" />
             Thêm bạn bè
           </Button>
         </div>
+        <AddFriendModal isOpen={showAdd} onClose={() => setShowAdd(false)} onAdded={(f) => setFriends((s) => [f, ...s])} />
       </aside>
     </>
   );

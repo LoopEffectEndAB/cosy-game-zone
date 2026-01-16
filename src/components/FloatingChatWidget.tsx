@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { 
   MessageCircle, 
   X, 
@@ -9,6 +9,7 @@ import {
   Minimize2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import api from "@/lib/api";
 
 interface Friend {
   id: number;
@@ -26,46 +27,54 @@ interface Message {
   time: string;
 }
 
-const friends: Friend[] = [
-  { id: 1, name: "ProGamer_VN", avatar: "https://i.pravatar.cc/100?img=11", status: "playing", game: "Cyber Racers", lastMessage: "Đang farm rank nè" },
-  { id: 2, name: "NightWolf99", avatar: "https://i.pravatar.cc/100?img=12", status: "online", lastMessage: "OK bro, đợi tí nhé" },
-  { id: 3, name: "DragonSlayer", avatar: "https://i.pravatar.cc/100?img=13", status: "online", lastMessage: "Tối nay chơi game hông?" },
-  { id: 4, name: "CyberNinja", avatar: "https://i.pravatar.cc/100?img=14", status: "offline", lastMessage: "GG!" },
-  { id: 5, name: "PixelMaster", avatar: "https://i.pravatar.cc/100?img=15", status: "playing", game: "Space Warriors", lastMessage: "Xem stream không?" },
-];
-
 const mockMessages: Message[] = [
   { id: 1, text: "Hey! Đang chơi game gì vậy?", sender: "friend", time: "10:30" },
   { id: 2, text: "Đang farm rank Cyber Racers nè 😎", sender: "me", time: "10:31" },
-  { id: 3, text: "Ngon! Để tí vào party cùng nhé", sender: "friend", time: "10:32" },
-  { id: 4, text: "OK bro, đợi tí nha", sender: "me", time: "10:32" },
 ];
 
 const FloatingChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [friends, setFriends] = useState<Friend[]>([]);
   const [messages, setMessages] = useState<Message[]>(mockMessages);
   const [newMessage, setNewMessage] = useState("");
+  const socketRef = useRef<any>(null);
 
-  const filteredFriends = friends.filter(f => 
-    f.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await api.getFriends();
+        if (mounted && res?.ok) setFriends(res.friends || []);
+      } catch (e) {
+        // ignore
+      }
+    })();
 
+    return () => { mounted = false; };
+  }, []);
+
+  const filteredFriends = friends.filter(f => f.name.toLowerCase().includes(searchQuery.toLowerCase()));
   const onlineFriends = filteredFriends.filter(f => f.status !== "offline");
   const offlineFriends = filteredFriends.filter(f => f.status === "offline");
 
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
-    
-    const message: Message = {
-      id: messages.length + 1,
-      text: newMessage,
-      sender: "me",
-      time: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
-    };
-    
-    setMessages([...messages, message]);
+    const message: Message = { id: messages.length + 1, text: newMessage, sender: "me", time: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) };
+    setMessages((m) => [...m, message]);
+
+    if (selectedFriend) {
+      try {
+        const socket = socketRef.current;
+        if (socket && socket.connected) {
+          socket.emit("message", { room: `room-${selectedFriend.id}`, message: newMessage, sender: "me" });
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+
     setNewMessage("");
   };
 
@@ -80,8 +89,25 @@ const FloatingChatWidget = () => {
     online: "text-neon-green fill-neon-green",
     playing: "text-neon-cyan fill-neon-cyan",
     offline: "text-muted-foreground fill-muted-foreground",
-  };
+  } as const;
 
+  useEffect(() => {
+    if (!selectedFriend) return;
+    const socket = api.createSocket();
+    socketRef.current = socket;
+
+    socket.emit("joinRoom", `room-${selectedFriend.id}`);
+
+    const onMessage = (payload: any) => {
+      setMessages((m) => [...m, { id: payload.id || Date.now(), text: payload.message, sender: payload.sender === "me" ? "me" : "friend", time: new Date(payload.time).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) }]);
+    };
+
+    socket.on("message", onMessage);
+
+    return () => {
+      socket.off("message", onMessage);
+    };
+  }, [selectedFriend]);
   return (
     <>
       {/* Floating Action Button */}

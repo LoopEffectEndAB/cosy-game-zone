@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import auth from "@/lib/auth";
 import { 
   Gamepad2, 
   User, 
@@ -20,6 +21,13 @@ interface NavbarProps {
 
 const Navbar = ({ onAuthClick, onWalletClick }: NavbarProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState(auth.getUser());
+
+  useEffect(() => {
+    const handler = () => setUser(auth.getUser());
+    window.addEventListener('auth-change', handler);
+    return () => window.removeEventListener('auth-change', handler);
+  }, []);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-border/50">
@@ -69,10 +77,19 @@ const Navbar = ({ onAuthClick, onWalletClick }: NavbarProps) => {
               <span className="font-bold">Nạp tiền</span>
               <Sparkles className="w-3 h-3 text-neon-orange ml-1" />
             </Button>
-            <Button variant="gaming" size="sm" onClick={onAuthClick}>
-              <User className="w-4 h-4" />
-              <span>Đăng nhập</span>
-            </Button>
+            {user ? (
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">{user.username}</span>
+                <Button variant="ghost" size="sm" onClick={() => { auth.logout(); }}>
+                  Đăng xuất
+                </Button>
+              </div>
+            ) : (
+              <Button variant="gaming" size="sm" onClick={onAuthClick}>
+                <User className="w-4 h-4" />
+                <span>Đăng nhập</span>
+              </Button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
