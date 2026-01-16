@@ -1,4 +1,5 @@
 // Minimal entry that starts the server via `start()` exported from app.js
+require('dotenv').config();
 const { start } = require('./app');
 
 (async function main() {

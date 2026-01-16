@@ -14,7 +14,15 @@ const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret';
 
 function createApp() {
   const app = express();
-  app.use(cors());
+  
+  // Configure CORS - allow frontend on localhost:8080 and other ports
+  const corsOptions = {
+    origin: process.env.CORS_ORIGIN || ['http://localhost:8080', 'http://localhost:3000', 'http://127.0.0.1:8080'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  };
+  app.use(cors(corsOptions));
   app.use(express.json());
 
   app.use('/api/auth', authRouter);
@@ -31,7 +39,14 @@ async function start(port = 0) {
   await init();
   const app = createApp();
   const server = http.createServer(app);
-  const io = new Server(server, { cors: { origin: true, methods: ['GET', 'POST'] } });
+  
+  // Configure Socket.IO CORS to match Express CORS
+  const socketIoCorsOptions = {
+    origin: process.env.CORS_ORIGIN || ['http://localhost:8080', 'http://localhost:3000', 'http://127.0.0.1:8080'],
+    credentials: true,
+    methods: ['GET', 'POST']
+  };
+  const io = new Server(server, { cors: socketIoCorsOptions });
 
   io.use((socket, next) => {
     const token = socket.handshake.auth && socket.handshake.auth.token;
