@@ -1,34 +1,100 @@
 const express = require("express");
 const router = express.Router();
-const { db } = require('../db');
+const { getPool, sql } = require('../db');
 const { requireAuth } = require('../middleware/auth');
 
-router.get("/", async (req, res) => {
-  await db.read();
-  res.json({ ok: true, friends: db.data.friends || [] });
+// Get friends
+router.get("/", requireAuth, async (req, res) => {
+  try {
+    const pool = getPool();
+    const result = await pool.request()
+      .input('userId', sql.Int, req.user.id)
+      .query(`
+        SELECT id, name, avatar, status, created_at
+        FROM dbo.friends 
+        WHERE user_id = @userId
+        ORDER BY id
+      `);
+    
+    res.json({ ok: true, friends: result.recordset });
+  } catch (err) {
+    console.error('Get friends error:', err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Add friend
 router.post('/add', requireAuth, async (req, res) => {
-  const { name, avatar } = req.body;
-  if (!name) return res.status(400).json({ error: 'Missing name' });
-  await db.read();
-  const newFriend = { id: Date.now(), name, avatar: avatar || `https://i.pravatar.cc/100?u=${name}`, status: 'offline' };
-  db.data.friends.push(newFriend);
-  await db.write();
-  res.json({ ok: true, friend: newFriend });
+  try {
+    const { name, avatar } = req.body;
+    
+    if (!name) {
+      return res.status(400).json({ error: 'Missing name' });
+    }
+
+    const pool = getPool();
+
+    // Insert friend
+    const result = await pool.request()
+      .input('userId', sql.Int, req.user.id)
+      .input('name', sql.NVarChar(100), name)
+      .input('avatar', sql.NVarChar(sql.MAX), avatar || `https://i.pravatar.cc/100?u=${name}`)
+      .input('status', sql.NVarChar(20), 'offline')
+      .query(`
+        INSERT INTO dbo.friends (user_id, name, avatar, status, created_at)
+        VALUES (@userId, @name, @avatar, @status, GETUTCDATE());
+        SELECT @@IDENTITY as id;
+      `);
+
+    const friendId = result.recordset[0].id;
+
+    res.json({ 
+      ok: true, 
+      friend: { 
+        id: friendId, 
+        name, 
+        avatar: avatar || `https://i.pravatar.cc/100?u=${name}`, 
+        status: 'offline' 
+      } 
+    });
+  } catch (err) {
+    console.error('Add friend error:', err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Update friend status
 router.patch('/:id/status', requireAuth, async (req, res) => {
-  const id = Number(req.params.id);
-  const { status } = req.body;
-  await db.read();
-  const f = db.data.friends.find(x => x.id === id);
-  if (!f) return res.status(404).json({ error: 'Not found' });
-  f.status = status;
-  await db.write();
-  res.json({ ok: true, friend: f });
+  try {
+    const id = Number(req.params.id);
+    const { status } = req.body;
+
+    const pool = getPool();
+
+    // Update status
+    await pool.request()
+      .input('id', sql.Int, id)
+      .input('status', sql.NVarChar(20), status)
+      .query(`
+        UPDATE dbo.friends 
+        SET status = @status 
+        WHERE id = @id
+      `);
+
+    // Get updated friend
+    const result = await pool.request()
+      .input('id', sql.Int, id)
+      .query(`SELECT * FROM dbo.friends WHERE id = @id`);
+
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+
+    res.json({ ok: true, friend: result.recordset[0] });
+  } catch (err) {
+    console.error('Update friend status error:', err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;

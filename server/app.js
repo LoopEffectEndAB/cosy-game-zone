@@ -12,12 +12,22 @@ const { init } = require('./db');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret';
 
+// Parse CORS_ORIGIN from environment
+function parseCorsOrigin() {
+  const origin = process.env.CORS_ORIGIN;
+  if (!origin) {
+    return ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'];
+  }
+  return origin.split(',').map(s => s.trim());
+}
+
 function createApp() {
   const app = express();
   
-  // Configure CORS - allow frontend on localhost:8080 and other ports
+  // Configure CORS - allow frontend
+  const corsOrigins = parseCorsOrigin();
   const corsOptions = {
-    origin: process.env.CORS_ORIGIN || ['http://localhost:8080', 'http://localhost:3000', 'http://127.0.0.1:8080'],
+    origin: corsOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -41,8 +51,9 @@ async function start(port = 0) {
   const server = http.createServer(app);
   
   // Configure Socket.IO CORS to match Express CORS
+  const corsOrigins = parseCorsOrigin();
   const socketIoCorsOptions = {
-    origin: process.env.CORS_ORIGIN || ['http://localhost:8080', 'http://localhost:3000', 'http://127.0.0.1:8080'],
+    origin: corsOrigins,
     credentials: true,
     methods: ['GET', 'POST']
   };
