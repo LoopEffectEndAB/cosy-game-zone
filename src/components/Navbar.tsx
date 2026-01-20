@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import auth from "@/lib/auth";
 import { 
@@ -22,6 +23,7 @@ interface NavbarProps {
 const Navbar = ({ onAuthClick, onWalletClick }: NavbarProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState(auth.getUser());
+  const location = useLocation();
 
   useEffect(() => {
     const handler = () => setUser(auth.getUser());
@@ -46,10 +48,10 @@ const Navbar = ({ onAuthClick, onWalletClick }: NavbarProps) => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
-            <NavItem icon={<Gamepad2 className="w-4 h-4" />} label="Games" active />
-            <NavItem icon={<Trophy className="w-4 h-4" />} label="Xếp hạng" />
-            <NavItem icon={<Users className="w-4 h-4" />} label="Bạn bè" />
-            <NavItem icon={<MessageCircle className="w-4 h-4" />} label="Tin nhắn" />
+            <NavItem to="/games" icon={<Gamepad2 className="w-4 h-4" />} label="Games" active={location.pathname === '/games'} />
+            <NavItem to="/leaderboard" icon={<Trophy className="w-4 h-4" />} label="Xếp hạng" active={location.pathname === '/leaderboard'} />
+            <NavItem to="/friends" icon={<Users className="w-4 h-4" />} label="Bạn bè" active={location.pathname === '/friends'} />
+            <NavItem to="/messages" icon={<MessageCircle className="w-4 h-4" />} label="Tin nhắn" active={location.pathname === '/messages'} />
           </div>
 
           {/* Search Bar */}
@@ -105,10 +107,10 @@ const Navbar = ({ onAuthClick, onWalletClick }: NavbarProps) => {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-border/50 animate-slide-up">
             <div className="flex flex-col gap-2">
-              <MobileNavItem icon={<Gamepad2 className="w-5 h-5" />} label="Games" active />
-              <MobileNavItem icon={<Trophy className="w-5 h-5" />} label="Xếp hạng" />
-              <MobileNavItem icon={<Users className="w-5 h-5" />} label="Bạn bè" />
-              <MobileNavItem icon={<MessageCircle className="w-5 h-5" />} label="Tin nhắn" />
+              <MobileNavItem to="/games" icon={<Gamepad2 className="w-5 h-5" />} label="Games" active={location.pathname === '/games'} />
+              <MobileNavItem to="/leaderboard" icon={<Trophy className="w-5 h-5" />} label="Xếp hạng" active={location.pathname === '/leaderboard'} />
+              <MobileNavItem to="/friends" icon={<Users className="w-5 h-5" />} label="Bạn bè" active={location.pathname === '/friends'} />
+              <MobileNavItem to="/messages" icon={<MessageCircle className="w-5 h-5" />} label="Tin nhắn" active={location.pathname === '/messages'} />
               <div className="flex gap-2 mt-4">
                 <Button variant="neon" size="sm" className="flex-1" onClick={onWalletClick}>
                   <Wallet className="w-4 h-4" />
@@ -127,8 +129,9 @@ const Navbar = ({ onAuthClick, onWalletClick }: NavbarProps) => {
   );
 };
 
-const NavItem = ({ icon, label, active }: { icon: React.ReactNode; label: string; active?: boolean }) => (
-  <button
+const NavItem = ({ to, icon, label, active }: { to: string; icon: React.ReactNode; label: string; active?: boolean }) => (
+  <Link
+    to={to}
     className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 ${
       active 
         ? "text-primary bg-primary/10" 
@@ -137,11 +140,12 @@ const NavItem = ({ icon, label, active }: { icon: React.ReactNode; label: string
   >
     {icon}
     <span className="font-medium">{label}</span>
-  </button>
+  </Link>
 );
 
-const MobileNavItem = ({ icon, label, active }: { icon: React.ReactNode; label: string; active?: boolean }) => (
-  <button
+const MobileNavItem = ({ to, icon, label, active }: { to: string; icon: React.ReactNode; label: string; active?: boolean }) => (
+  <Link
+    to={to}
     className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
       active 
         ? "text-primary bg-primary/10" 
@@ -150,7 +154,7 @@ const MobileNavItem = ({ icon, label, active }: { icon: React.ReactNode; label: 
   >
     {icon}
     <span className="font-medium">{label}</span>
-  </button>
+  </Link>
 );
 
 export default Navbar;
