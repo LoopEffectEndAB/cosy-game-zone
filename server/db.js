@@ -1,14 +1,19 @@
 const sql = require('mssql');
 
-// Cấu hình SQL Server
+// Cấu hình SQL Server - Windows Authentication
 const config = {
   server: process.env.DB_SERVER || 'DESKTOP-4A49R3D',
-  user: process.env.DB_USER || 'sa',
-  password: process.env.DB_PASSWORD || '1234',
   database: process.env.DB_NAME || 'cosy_game_zone',
   port: parseInt(process.env.DB_PORT || 1433),
   encrypt: process.env.DB_ENCRYPT === 'true',
   trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE !== 'false',
+  authentication: {
+    type: 'default',
+    options: {
+      userName: process.env.DB_USER || 'DESKTOP-4A49R3D\\Dell',
+      password: process.env.DB_PASSWORD || ''
+    }
+  },
   connectionTimeout: 15000,
   requestTimeout: 30000,
 };
