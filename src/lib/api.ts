@@ -60,4 +60,4 @@ export function getSocket() {
   return _socket;
 }
 
-export default { register, login, getGames, getFriends, getLeaderboard, submitScore, createSocket, getSocket };
+export default { register, login, getGames, getFriends, getLeaderboard, submitScore, addFriend, createSocket, getSocket };
