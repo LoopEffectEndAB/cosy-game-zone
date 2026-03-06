@@ -4,9 +4,6 @@ import api from "@/lib/api";
 import { toast } from "@/components/ui/use-toast";
 import auth from "@/lib/auth";
 
-import { useEffect, useState } from "react";
-import api from "@/lib/api";
-
 const Leaderboard = () => {
   const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
   const [submitName, setSubmitName] = useState(auth.getUser()?.username || "");
