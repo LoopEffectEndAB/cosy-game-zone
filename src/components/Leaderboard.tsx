@@ -69,6 +69,7 @@ const Leaderboard = () => {
         </div>
 
         {/* Top 3 Podium */}
+        {leaderboardData.length >= 3 && (
         <div className="flex items-end justify-center gap-4 mb-12">
           {/* 2nd Place */}
           <div className="flex flex-col items-center">
@@ -136,6 +137,7 @@ const Leaderboard = () => {
             </div>
           </div>
         </div>
+        )}
 
         {/* Leaderboard Table */}
         <div className="max-w-2xl mx-auto glass-card rounded-2xl overflow-hidden">
