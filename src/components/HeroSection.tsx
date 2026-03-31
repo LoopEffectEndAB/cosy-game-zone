@@ -29,16 +29,10 @@ const HeroSection = () => {
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 text-center">
         <div className="max-w-4xl mx-auto">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card border-primary/30 mb-8 animate-fade-in">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-primary">Nền tảng game #1 Việt Nam</span>
-          </div>
-
           {/* Title */}
           <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-black mb-6 animate-slide-up">
-            <span className="block text-foreground">CHƠI GAME</span>
-            <span className="block gradient-text">KHÔNG GIỚI HẠN</span>
+            <span className="block text-foreground">NƠI CẢM XÚC</span>
+            <span className="block gradient-text">THĂNG HOA</span>
           </h1>
 
           {/* Subtitle */}
