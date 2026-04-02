@@ -8,7 +8,6 @@ import AuthModal from "@/components/AuthModal";
 import WalletModal from "@/components/WalletModal";
 import Footer from "@/components/Footer";
 import ThemeBackground from "@/components/ThemeBackground";
-import Footer from "@/components/Footer";
 
 const Index = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
