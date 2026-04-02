@@ -5,6 +5,7 @@ import FriendsSidebar from "@/components/FriendsSidebar";
 import AuthModal from "@/components/AuthModal";
 import WalletModal from "@/components/WalletModal";
 import Footer from "@/components/Footer";
+import ThemeBackground from "@/components/ThemeBackground";
 
 const mockFriend = {
   id: 1,

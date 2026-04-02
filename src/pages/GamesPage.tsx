@@ -6,13 +6,15 @@ import AuthModal from "@/components/AuthModal";
 import WalletModal from "@/components/WalletModal";
 import FloatingChatWidget from "@/components/FloatingChatWidget";
 import Footer from "@/components/Footer";
+import ThemeBackground from "@/components/ThemeBackground";
 
 const GamesPage = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isWalletOpen, setIsWalletOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <ThemeBackground />
       <Navbar
         onAuthClick={() => setIsAuthOpen(true)}
         onWalletClick={() => setIsWalletOpen(true)}
