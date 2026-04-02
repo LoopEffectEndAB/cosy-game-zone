@@ -21,7 +21,8 @@ const MessagesPage = () => {
   const [showFriends, setShowFriends] = useState(true);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <ThemeBackground />
       <Navbar
         onAuthClick={() => setIsAuthOpen(true)}
         onWalletClick={() => setIsWalletOpen(true)}
