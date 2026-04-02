@@ -5,6 +5,7 @@ import ChatWindow from "@/components/ChatWindow";
 import AuthModal from "@/components/AuthModal";
 import WalletModal from "@/components/WalletModal";
 import Footer from "@/components/Footer";
+import ThemeBackground from "@/components/ThemeBackground";
 
 const FriendsPage = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -12,7 +13,8 @@ const FriendsPage = () => {
   const [chatFriend, setChatFriend] = useState<any>(null);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <ThemeBackground />
       <Navbar
         onAuthClick={() => setIsAuthOpen(true)}
         onWalletClick={() => setIsWalletOpen(true)}

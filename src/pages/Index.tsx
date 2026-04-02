@@ -7,6 +7,7 @@ import FloatingChatWidget from "@/components/FloatingChatWidget";
 import AuthModal from "@/components/AuthModal";
 import WalletModal from "@/components/WalletModal";
 import Footer from "@/components/Footer";
+import ThemeBackground from "@/components/ThemeBackground";
 
 const Index = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -19,7 +20,8 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <ThemeBackground />
       {/* Navbar */}
       <Navbar 
         onAuthClick={() => setIsAuthOpen(true)} 

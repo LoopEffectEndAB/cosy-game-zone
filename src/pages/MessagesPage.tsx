@@ -5,6 +5,7 @@ import FriendsSidebar from "@/components/FriendsSidebar";
 import AuthModal from "@/components/AuthModal";
 import WalletModal from "@/components/WalletModal";
 import Footer from "@/components/Footer";
+import ThemeBackground from "@/components/ThemeBackground";
 
 const mockFriend = {
   id: 1,
@@ -20,7 +21,8 @@ const MessagesPage = () => {
   const [showFriends, setShowFriends] = useState(true);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <ThemeBackground />
       <Navbar
         onAuthClick={() => setIsAuthOpen(true)}
         onWalletClick={() => setIsWalletOpen(true)}

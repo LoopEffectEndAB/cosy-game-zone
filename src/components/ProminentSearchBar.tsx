@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Search, X, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ThemeSearchDecoration from "@/components/ThemeSearchDecoration";
 
 interface ProminentSearchBarProps {
   onSearch?: (query: string) => void;
@@ -45,6 +46,7 @@ const ProminentSearchBar = ({ onSearch }: ProminentSearchBarProps) => {
             
             {/* Main Search Input */}
             <div className="relative flex items-center gap-4 p-2 rounded-2xl bg-card/95 backdrop-blur-xl border-2 border-primary/50">
+              <ThemeSearchDecoration />
               {/* Search Icon */}
               <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/20 ml-2">
                 <Search className={`w-6 h-6 transition-colors duration-300 ${
