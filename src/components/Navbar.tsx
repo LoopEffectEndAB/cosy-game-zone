@@ -69,7 +69,8 @@ const Navbar = ({ onAuthClick, onWalletClick }: NavbarProps) => {
 
           {/* Actions */}
           <div className="hidden md:flex items-center gap-3">
-            <Button 
+            <ThemeSwitcher />
+            <Button
               variant="neon" 
               size="sm" 
               onClick={onWalletClick}
