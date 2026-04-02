@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Search, X, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ThemeSearchDecoration from "@/components/ThemeSearchDecoration";
 
 interface ProminentSearchBarProps {
   onSearch?: (query: string) => void;
