@@ -14,6 +14,7 @@ import {
   Search,
   Sparkles
 } from "lucide-react";
+import ThemeSwitcher from "@/components/ThemeSwitcher";
 
 interface NavbarProps {
   onAuthClick: () => void;
